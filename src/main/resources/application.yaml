@@ -16,3 +16,9 @@ my:
         ten: ${random.int(10)}
     in:
       range: ${random.int[1024,65536]}
+
+logging:
+  level:
+    root: WARN
+    org.springframework.web: DEBUG
+    org.hibernate: ERROR
