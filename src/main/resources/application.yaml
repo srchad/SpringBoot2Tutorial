@@ -4,3 +4,15 @@ server:
     restart:
       log-condition-evaluation-delta: false
       exclude: static/**,public/**
+
+my:
+  secret: ${random.value}
+  num: ${random.int}
+  bignumber: ${random.long}
+  uuid: ${random.uuid}
+  number:
+    less:
+      than:
+        ten: ${random.int(10)}
+    in:
+      range: ${random.int[1024,65536]}
