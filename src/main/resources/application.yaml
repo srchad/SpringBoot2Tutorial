@@ -18,7 +18,19 @@ my:
       range: ${random.int[1024,65536]}
 
 logging:
+  config: classpath:logback-dev.xml
   level:
     root: WARN
+    com.tistory.lky1001.boot2tutorial: DEBUG
     org.springframework.web: DEBUG
     org.hibernate: ERROR
+
+---
+
+spring:
+  profiles: dev
+
+---
+
+spring:
+  profiles: prod

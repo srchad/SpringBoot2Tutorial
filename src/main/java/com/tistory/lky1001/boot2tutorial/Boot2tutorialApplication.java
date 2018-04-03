@@ -6,6 +6,8 @@ import com.tistory.lky1001.boot2tutorial.listener.ApplicationPreparedEventListen
 import com.tistory.lky1001.boot2tutorial.listener.ApplicationReadyListener;
 import com.tistory.lky1001.boot2tutorial.listener.ApplicationStartedEventListener;
 import com.tistory.lky1001.boot2tutorial.listener.ApplicationStartingEventListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.Banner;
@@ -40,6 +42,9 @@ public class Boot2tutorialApplication {
 
 	@Component
 	static class Test implements InitializingBean {
+
+		private final Logger logger = LoggerFactory.getLogger(getClass());
+
 		@Value("${my.uuid}")
 		public String uuid;
 
@@ -68,12 +73,12 @@ public class Boot2tutorialApplication {
 			2
 			3097
 			/**/
-			System.out.println(uuid);
-			System.out.println(secret);
-			System.out.println(number);
-			System.out.println(bignumber);
-			System.out.println(ten);
-			System.out.println(range);
+			logger.debug("uuid : {}", uuid);
+			logger.debug("secret : {}", secret);
+			logger.debug("uuid : {}", number);
+			logger.debug("bignumber : {}", bignumber);
+			logger.debug("ten : {}", ten);
+			logger.debug("range : {}", range);
 		}
 	}
 }
