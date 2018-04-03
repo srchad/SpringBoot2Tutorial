@@ -1,2 +1,6 @@
 server:
   port: 8000
+  devtools:
+    restart:
+      log-condition-evaluation-delta: false
+      exclude: static/**,public/**
