@@ -1,5 +1,6 @@
 package com.tistory.lky1001.boot2tutorial;
 
+import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -7,6 +8,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class Boot2tutorialApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Boot2tutorialApplication.class, args);
+		SpringApplication app = new SpringApplication(Boot2tutorialApplication.class);
+		app.setBannerMode(Banner.Mode.OFF);
+		app.run(args);
 	}
 }
