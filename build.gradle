@@ -25,4 +25,8 @@ subprojects {
     repositories {
         mavenCentral()
     }
+
+    dependencies{
+        compile "org.projectlombok:lombok:1.16.20"
+    }
 }
