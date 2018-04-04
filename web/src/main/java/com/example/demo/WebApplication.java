@@ -24,18 +24,24 @@ import java.util.List;
 @SpringBootApplication
 public class WebApplication {
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
+        //./gradlew :web:bootjar && java -jar web/build/libs/web.jar --debug log.txt&
+        System.exit(SpringApplication
+                .exit(new SpringApplicationBuilder()
+                        .sources(CoreApplication.class)
+                        .child(WebApplication.class)
+                        .bannerMode(Banner.Mode.LOG)
+                        .listeners((ApplicationListener<ApplicationStartingEvent>) event -> log.info("Application is starting..."))
+                        .listeners((ApplicationListener<ApplicationEnvironmentPreparedEvent>) event -> log.info("Application environment is prepared."))
+                        .listeners((ApplicationListener<ApplicationStartedEvent>) event -> log.info("Application is started at {}.", event.getTimestamp()))
+                        .listeners((ApplicationListener<ApplicationReadyEvent>) event -> log.info("Application is ready now."))
+                        .run(args)));
+    }
 
-        new SpringApplicationBuilder()
-                .sources(CoreApplication.class)
-                .child(WebApplication.class)
-                .bannerMode(Banner.Mode.LOG)
-                .listeners((ApplicationListener<ApplicationStartingEvent>) event -> log.info("Application is starting..."))
-                .listeners((ApplicationListener<ApplicationEnvironmentPreparedEvent>) event -> log.info("Application environment is prepared."))
-                .listeners((ApplicationListener<ApplicationStartedEvent>) event -> log.info("Application is started at {}.", event.getTimestamp()))
-                .listeners((ApplicationListener<ApplicationReadyEvent>) event -> log.info("Application is ready now."))
-                .run(args);
-	}
+    @Bean
+    public ExitCodeGenerator exitCodeGenerator() {
+        return () -> 42;
+    }
 
 	@RestController
     @RequestMapping("api")
