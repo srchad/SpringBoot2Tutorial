@@ -1,5 +1,7 @@
 package com.example.demo;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +15,7 @@ import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEven
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.context.event.ApplicationStartingEvent;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -86,29 +90,32 @@ public class WebApplication {
 
     @Component
     @Order(3)
+    @ConfigurationProperties(prefix="my")
     public class CLRImple3 implements CommandLineRunner {
-        @Value("${my.secret}")
-        private String secret;
-        
-        @Value("${my.number}")
-        private int number;
 
-        @Value("${my.bignumber}")
-        private long bignumber;
+        private final Config config;
 
-        @Value("${my.uuid}")
-        private String uuid;
-
-        @Value("${my.number.less.than.ten}")
-        private int numberLessThanTen;
-
-        @Value("${my.number.in.range}")
-        private int numberInRange;
-
+        @Autowired
+        public CLRImple3(Config config) {
+            this.config = config;
+        }
 
         public void run(String... args) {
             log.info("random values = [ secret : {}, number : {}, bignumber : {}, uuid : {}, numberLessThanTen : {}, numberInRange : {} ]",
-                    secret, number, bignumber, uuid, numberLessThanTen, numberInRange);
+                    config.secret, config.number, config.bignumber, config.uuid, config.numberLessThanTen, config.numberInRange);
         }
+    }
+
+    @Getter
+    @Setter
+    @Component
+    @ConfigurationProperties(prefix="my")
+    public class Config {
+        private String secret;
+        private int number;
+        private long bignumber;
+        private String uuid;
+        private int numberLessThanTen;
+        private int numberInRange;
     }
 }
