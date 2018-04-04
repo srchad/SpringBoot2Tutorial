@@ -103,6 +103,7 @@ public class WebApplication {
         public void run(String... args) {
             log.info("random values = [ secret : {}, number : {}, bignumber : {}, uuid : {}, numberLessThanTen : {}, numberInRange : {} ]",
                     config.secret, config.number, config.bignumber, config.uuid, config.numberLessThanTen, config.numberInRange);
+            log.info("members : {}", config.getMembers().toString());
         }
     }
 
@@ -117,5 +118,6 @@ public class WebApplication {
         private String uuid;
         private int numberLessThanTen;
         private int numberInRange;
+        private List<String> members;
     }
 }
