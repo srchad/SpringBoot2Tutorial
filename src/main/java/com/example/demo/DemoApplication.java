@@ -13,16 +13,6 @@ import org.springframework.context.event.EventListener;
 @SpringBootApplication
 public class DemoApplication {
 
-//    @Bean
-//    public ExitCodeGenerator exitCodeGenerator() {
-//        return () -> 2;
-//    }
-//
-//    public static void main(String[] args) {
-//        System.exit(SpringApplication
-//                .exit(SpringApplication.run(DemoApplication.class, args)));
-//    }
-
     public static void main(String[] args) {
         new SpringApplicationBuilder()
                 .sources(DemoApplication.class)
