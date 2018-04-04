@@ -3,7 +3,10 @@ package com.example.demo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.*;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.Banner;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
@@ -25,17 +28,15 @@ import java.util.List;
 public class WebApplication {
 
     public static void main(String[] args) {
-        //./gradlew :web:bootjar && java -jar web/build/libs/web.jar --debug log.txt&
-        System.exit(SpringApplication
-                .exit(new SpringApplicationBuilder()
-                        .sources(CoreApplication.class)
-                        .child(WebApplication.class)
-                        .bannerMode(Banner.Mode.LOG)
-                        .listeners((ApplicationListener<ApplicationStartingEvent>) event -> log.info("Application is starting..."))
-                        .listeners((ApplicationListener<ApplicationEnvironmentPreparedEvent>) event -> log.info("Application environment is prepared."))
-                        .listeners((ApplicationListener<ApplicationStartedEvent>) event -> log.info("Application is started at {}.", event.getTimestamp()))
-                        .listeners((ApplicationListener<ApplicationReadyEvent>) event -> log.info("Application is ready now."))
-                        .run(args)));
+        new SpringApplicationBuilder()
+                .sources(CoreApplication.class)
+                .child(WebApplication.class)
+                .bannerMode(Banner.Mode.LOG)
+                .listeners((ApplicationListener<ApplicationStartingEvent>) event -> log.info("Application is starting..."))
+                .listeners((ApplicationListener<ApplicationEnvironmentPreparedEvent>) event -> log.info("Application environment is prepared."))
+                .listeners((ApplicationListener<ApplicationStartedEvent>) event -> log.info("Application is started at {}.", event.getTimestamp()))
+                .listeners((ApplicationListener<ApplicationReadyEvent>) event -> log.info("Application is ready now."))
+                .run(args);
     }
 
     @Bean
@@ -46,9 +47,12 @@ public class WebApplication {
     @RestController
     @RequestMapping("api")
     public static class MainController {
+        @Value("${user.name}") private String property;
+
         @GetMapping
         public String helloWorld() {
-            return "Hello World!";
+            // ./gradlew :web:bootjar && java -jar web/build/libs/web.jar --debug log.txt --user.name=Frank.park& open "localhost:8080"
+            return "Hello " + property + "!";
         }
     }
 
@@ -112,13 +116,4 @@ public class WebApplication {
                     secret, number, bignumber, uuid, numberLessThanTen, numberInRange);
         }
     }
-
-
-
-
-
-
-
-
-
 }
