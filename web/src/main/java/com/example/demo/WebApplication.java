@@ -2,6 +2,7 @@ package com.example.demo;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -78,4 +79,46 @@ public class WebApplication {
             if (args.length > 0) log.info("1. args : {}", args[0]);
         }
     }
+
+    @Component
+    @Order(3)
+    public class CLRImple3 implements CommandLineRunner {
+        private String secret;
+        private int number;
+        private long bignumber;
+        private String uuid;
+        private int numberLessThanTen;
+        private int numberInRange;
+
+        @Autowired
+        public CLRImple3(
+                @Value("${my.secret}") String secret,
+                @Value("${my.number}") int number,
+                @Value("${my.bignumber}") long bignumber,
+                @Value("${my.uuid}") String uuid,
+                @Value("${my.number.less.than.ten}") int numberLessThanTen,
+                @Value("${my.number.in.range}") int numberInRange
+        ) {
+            this.secret = secret;
+            this.number = number;
+            this.bignumber = bignumber;
+            this.uuid = uuid;
+            this.numberLessThanTen = numberLessThanTen;
+            this.numberInRange = numberInRange;
+        }
+
+        public void run(String... args) {
+            log.info("random values = [ secret : {}, number : {}, bignumber : {}, uuid : {}, numberLessThanTen : {}, numberInRange : {} ]",
+                    secret, number, bignumber, uuid, numberLessThanTen, numberInRange);
+        }
+    }
+
+
+
+
+
+
+
+
+
 }
