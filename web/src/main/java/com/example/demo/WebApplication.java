@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.Banner;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
@@ -11,6 +12,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.context.event.ApplicationStartingEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,14 +47,30 @@ public class WebApplication {
     }
 
     @Component
-    public class MyBean {
-
+    @Order(2)
+    public class ArgsPrinter {
         @Autowired
-        public MyBean(ApplicationArguments args) {
+        public ArgsPrinter(ApplicationArguments args) {
             boolean debug = args.containsOption("debug");
             List<String> files = args.getNonOptionArgs();
             log.info("debug : {}, files : {}", debug, files.toString());
             // if run with "--debug logfile.txt" debug=true, files=["logfile.txt"]
+        }
+    }
+
+    @Component
+    @Order(1)
+    public class CLRImple2 implements CommandLineRunner {
+        public void run(String... args) {
+            if(args.length > 1) log.info("2. args : {}", args[1]);
+        }
+    }
+
+    @Component
+    @Order(0)
+    public class CLRImple1 implements CommandLineRunner {
+        public void run(String... args) {
+            if(args.length > 0) log.info("1. args : {}", args[0]);
         }
     }
 }
