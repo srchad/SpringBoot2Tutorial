@@ -1,4 +1,9 @@
+spring:
+  profiles:
+    active: local
+
 my:
+  profile: ${spring.profiles.active}
   secret : ${random.value}
   number : ${random.int}
   bignumber : ${random.long}
