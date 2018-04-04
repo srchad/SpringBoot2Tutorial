@@ -1,6 +1,8 @@
 package com.example.demo;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.Banner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -9,9 +11,12 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.context.event.ApplicationStartingEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @Slf4j
 @SpringBootApplication
@@ -36,6 +41,18 @@ public class WebApplication {
 	    @GetMapping
         public String helloWorld(){
 	        return "Hello World!";
+        }
+    }
+
+    @Component
+    public class MyBean {
+
+        @Autowired
+        public MyBean(ApplicationArguments args) {
+            boolean debug = args.containsOption("debug");
+            List<String> files = args.getNonOptionArgs();
+            log.info("debug : {}, files : {}", debug, files.toString());
+            // if run with "--debug logfile.txt" debug=true, files=["logfile.txt"]
         }
     }
 }
