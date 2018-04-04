@@ -87,29 +87,24 @@ public class WebApplication {
     @Component
     @Order(3)
     public class CLRImple3 implements CommandLineRunner {
+        @Value("${my.secret}")
         private String secret;
+        
+        @Value("${my.number}")
         private int number;
+
+        @Value("${my.bignumber}")
         private long bignumber;
+
+        @Value("${my.uuid}")
         private String uuid;
+
+        @Value("${my.number.less.than.ten}")
         private int numberLessThanTen;
+
+        @Value("${my.number.in.range}")
         private int numberInRange;
 
-        @Autowired
-        public CLRImple3(
-                @Value("${my.secret}") String secret,
-                @Value("${my.number}") int number,
-                @Value("${my.bignumber}") long bignumber,
-                @Value("${my.uuid}") String uuid,
-                @Value("${my.number.less.than.ten}") int numberLessThanTen,
-                @Value("${my.number.in.range}") int numberInRange
-        ) {
-            this.secret = secret;
-            this.number = number;
-            this.bignumber = bignumber;
-            this.uuid = uuid;
-            this.numberLessThanTen = numberLessThanTen;
-            this.numberInRange = numberInRange;
-        }
 
         public void run(String... args) {
             log.info("random values = [ secret : {}, number : {}, bignumber : {}, uuid : {}, numberLessThanTen : {}, numberInRange : {} ]",
