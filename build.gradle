@@ -1,0 +1,24 @@
+plugins {
+	id 'org.springframework.boot' version '2.0.0.RELEASE'
+	id 'java'
+}
+
+
+jar {
+	baseName = 'mytest'
+	version =  '0.0.1-SNAPSHOT'
+}
+
+repositories {
+	jcenter()
+}
+
+dependencies {
+	compile("org.springframework.boot:spring-boot-starter-web")
+	testCompile("org.springframework.boot:spring-boot-starter-test")
+}
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
