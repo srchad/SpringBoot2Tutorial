@@ -1,5 +1,8 @@
 package kakao.springboot.demo.model;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class User {
     private Long id;
     private String name;
