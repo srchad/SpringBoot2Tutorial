@@ -10,6 +10,7 @@ import javax.validation.Valid;
 @RequestMapping("/users")
 public class SampleController {
 
+    @CrossOrigin
     @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
     public User getUser(@PathVariable Long userId){
         return new User(userId,"keywordBiz",10);
