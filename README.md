@@ -218,7 +218,7 @@ public class MyBean {
 ```
 
 #### 23.8 Using the ApplicationRunner or CommandLineRunner
-**If you need to run some specific code once the SpringApplication has started**, you can implement the ApplicationRunner or CommandLineRunner interfaces.
+If you need to run some specific code once the SpringApplication has started, you can implement the ApplicationRunner or CommandLineRunner interfaces.
 Both interfaces work in the same way and offer a single run method, which is called just before SpringApplication.run(…​) completes.
 The CommandLineRunner interfaces provides access to application arguments as a simple string array, whereas the ApplicationRunner uses the ApplicationArguments interface discussed earlier. 
 
@@ -432,3 +432,9 @@ logging.config
 The <springProfile> tag lets you optionally include or exclude sections of configuration based on the active Spring profiles.
 
 #### 26.6.2 Environment Properties
+
+# Study 3. 27~28
+
+## 27. Developing Web Applications
+
+### 27.1 The “Spring Web MVC Framework”
