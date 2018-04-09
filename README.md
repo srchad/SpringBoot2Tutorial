@@ -436,5 +436,247 @@ The <springProfile> tag lets you optionally include or exclude sections of confi
 # Study 3. 27~28
 
 ## 27. Developing Web Applications
+You can create a self-contained HTTP server by using embedded Tomcat, Jetty, Undertow, or Netty. 
+Most web applications use the spring-boot-starter-web module to get up and running quickly. 
+You can also choose to build reactive web applications by using the spring-boot-starter-webflux module.
 
 ### 27.1 The “Spring Web MVC Framework”
+Spring MVC lets you create special @Controller or @RestController beans to handle incoming HTTP requests. Methods in your controller are mapped to HTTP by using @RequestMapping annotations.
+
+#### 27.1.1 Spring MVC Auto-configuration
+
+#### 27.1.2 HttpMessageConverters
+Spring MVC uses the **HttpMessageConverter** interface to convert HTTP requests and responses. 
+Sensible defaults are included out of the box. 
+For example, objects can be automatically converted to JSON (by using the Jackson library) or XML (by using the Jackson XML extension, if available, or by using JAXB if the Jackson XML extension is not available). By default, strings are encoded in UTF-8.
+
+If you need to add or customize converters, you can use Spring Boot’s **HttpMessageConverters**.
+
+#### 27.1.3 Custom JSON Serializers and Deserializers
+You can use the **@JsonComponent** annotation directly on JsonSerializer or JsonDeserializer implementations. 
+You can also use it on classes that contain **serializers/deserializers as inner classes**.
+
+#### 27.1.4 MessageCodesResolver
+Spring MVC has a strategy for generating error codes for rendering error messages from binding errors: MessageCodesResolver.
+If you set the **spring.mvc.message-codes-resolver.format** property PREFIX_ERROR_CODE or POSTFIX_ERROR_CODE, Spring Boot creates one for you (see the enumeration in DefaultMessageCodesResolver.Format).
+
+#### 27.1.5 Static Content
+By default, Spring Boot serves static content from a directory called /static (or /public or /resources or /META-INF/resources) in the classpath or from the root of the ServletContext. 
+It uses the **ResourceHttpRequestHandler** from Spring MVC so that you can modify that behavior by **adding your own WebMvcConfigurer and overriding the addResourceHandlers method**.
+
+spring.mvc.static-path-pattern
+
+spring.resources.static-locations
+
+spring.resources.chain.strategy.content.enabled=true
+spring.resources.chain.strategy.content.paths=/**
+
+spring.resources.chain.strategy.content.enabled=true
+spring.resources.chain.strategy.content.paths=/**
+spring.resources.chain.strategy.fixed.enabled=true
+spring.resources.chain.strategy.fixed.paths=/js/lib/
+spring.resources.chain.strategy.fixed.version=v12
+
+#### 27.1.8 Path Matching and Content Negotiation
+Spring Boot chooses to disable suffix pattern matching by default, which means that requests like "GET /projects/spring-boot.json" won’t be matched to @GetMapping("/projects/spring-boot") mappings. 
+This is considered as a best practice for Spring MVC applications. 
+This feature was mainly useful in the past for HTTP clients which did not send proper "Accept" request headers; 
+we needed to make sure to send the correct Content Type to the client. Nowadays, Content Negotiation is much more reliable.
+
+There are other ways to deal with HTTP clients that don’t consistently send proper "Accept" request headers. 
+Instead of using suffix matching, we can use a query parameter to ensure that requests like "GET /projects/spring-boot?format=json" will be mapped to @GetMapping("/projects/spring-boot"):
+
+```
+spring.mvc.contentnegotiation.favor-parameter=true
+
+# We can change the parameter name, which is "format" by default:
+# spring.mvc.contentnegotiation.parameter-name=myparam
+
+# We can also register additional file extensions/media types with:
+spring.mvc.contentnegotiation.media-types.markdown=text/markdown
+```
+
+If you understand the caveats and would still like your application to use suffix pattern matching, the following configuration is required:
+```
+spring.mvc.contentnegotiation.favor-path-extension=true
+
+# You can also restrict that feature to known extensions only
+# spring.mvc.pathmatch.use-registered-suffix-pattern=true
+
+# We can also register additional file extensions/media types with:
+# spring.mvc.contentnegotiation.media-types.adoc=text/asciidoc
+```
+
+#### 27.1.9 ConfigurableWebBindingInitializer
+Spring MVC uses a **WebBindingInitializer** to initialize a WebDataBinder for a particular request. 
+
+#### 27.1.10 Template Engines
+- FreeMarker
+- Groovy
+- Thymeleaf
+- Mustache
+
+#### 27.1.11 Error Handling
+By default, Spring Boot provides an /error mapping that handles all errors in a sensible way, and it is registered as a “global” error page in the servlet container. 
+For machine clients, it produces a JSON response with details of the error, the HTTP status, and the exception message. 
+For browser clients, there is a “whitelabel” error view that renders the same data in HTML format (to customize it, add a View that resolves to error). 
+To replace the default behavior completely, you can implement ErrorController and register a bean definition of that type or add a bean of type ErrorAttributes to use the existing mechanism but replace the contents.
+
+You can also define a class annotated with **@ControllerAdvice** to customize the JSON document to return for a particular controller and/or exception type, as shown in the following example:
+
+##### Mapping Error Pages outside of Spring MVC
+For applications that do not use Spring MVC, you can use the ErrorPageRegistrar interface to directly register ErrorPages. 
+This abstraction works directly with the underlying embedded servlet container and works even if you do not have a Spring MVC DispatcherServlet.
+
+### 27.2 The “Spring WebFlux Framework”
+Spring WebFlux comes in two flavors: functional and annotation-based. The annotation-based one is quite close to the Spring MVC model.
+
+```
+@RestController
+@RequestMapping("/users")
+public class MyRestController {
+
+	@GetMapping("/{user}")
+	public Mono<User> getUser(@PathVariable Long user) {
+		// ...
+	}
+
+	@GetMapping("/{user}/customers")
+	public Flux<Customer> getUserCustomers(@PathVariable Long user) {
+		// ...
+	}
+
+	@DeleteMapping("/{user}")
+	public Mono<User> deleteUser(@PathVariable Long user) {
+		// ...
+	}
+
+}
+```
+
+“WebFlux.fn”, the functional variant, separates the routing configuration from the actual handling of the requests.
+```
+@Configuration
+public class RoutingConfiguration {
+
+	@Bean
+	public RouterFunction<ServerResponse> monoRouterFunction(UserHandler userHandler) {
+		return route(GET("/{user}").and(accept(APPLICATION_JSON)), userHandler::getUser)
+				.andRoute(GET("/{user}/customers").and(accept(APPLICATION_JSON)), userHandler::getUserCustomers)
+				.andRoute(DELETE("/{user}").and(accept(APPLICATION_JSON)), userHandler::deleteUser);
+	}
+
+}
+
+@Component
+public class UserHandler {
+
+	public Mono<ServerResponse> getUser(ServerRequest request) {
+		// ...
+	}
+
+	public Mono<ServerResponse> getUserCustomers(ServerRequest request) {
+		// ...
+	}
+
+	public Mono<ServerResponse> deleteUser(ServerRequest request) {
+		// ...
+	}
+}
+```
+
+To get started, add the **spring-boot-starter-webflux** module to your application.
+
+#### 27.2.1 Spring WebFlux Auto-configuration
+The auto-configuration adds the following features on top of Spring’s defaults:
+
+Configuring codecs for HttpMessageReader and HttpMessageWriter instances (described later in this document).
+Support for serving static resources, including support for WebJars (described later in this document).
+
+#### 27.2.2 HTTP Codecs with HttpMessageReaders and HttpMessageWriters
+Spring WebFlux uses the HttpMessageReader and HttpMessageWriter interfaces to convert HTTP requests and responses. 
+They are configured with CodecConfigurer to have sensible defaults by looking at the libraries available in your classpath.
+
+Spring Boot applies further customization by using CodecCustomizer instances. For example, spring.jackson.* configuration keys are applied to the Jackson codec.
+
+#### 27.2.3 Static Content
+By default, Spring Boot serves static content from a directory called /static (or /public or /resources or /META-INF/resources) in the classpath. 
+It uses the ResourceWebHandler from Spring WebFlux so that you can modify that behavior by adding your own WebFluxConfigurer and overriding the addResourceHandlers method.
+
+you can tune that by setting the spring.webflux.static-path-pattern property. 
+```
+spring.webflux.static-path-pattern=/resources/**
+```
+
+#### 27.2.4 Template Engines
+Spring Boot includes auto-configuration support for the following templating engines:
+
+FreeMarker
+Thymeleaf
+Mustache
+
+#### 27.2.5 Error Handling
+Spring Boot provides a **WebExceptionHandler** that handles all errors in a sensible way. Its position in the processing order is immediately before the handlers provided by WebFlux, which are considered last.
+
+The first step to customizing this feature often involves using the existing mechanism but replacing or augmenting the error contents. For that, you can add a bean of type ErrorAttributes.
+
+#### 27.2.6 Web Filters
+Spring WebFlux provides a WebFilter interface that can be implemented to filter HTTP request-response exchanges. WebFilter beans found in the application context will be automatically used to filter each exchange.
+
+### 27.3 JAX-RS and Jersey
+If you prefer the JAX-RS programming model for REST endpoints, you can use one of the available implementations instead of Spring MVC. Jersey 1.x and Apache CXF work quite well out of the box if you register their Servlet or Filter as a @Bean in your application context.
+To get started with Jersey 2.x, include the **spring-boot-starter-jersey** as a dependency and then you need one **@Bean** of type **ResourceConfig** in which you register all the endpoints.
+
+```
+@Component
+public class JerseyConfig extends ResourceConfig {
+	public JerseyConfig() {
+		register(Endpoint.class);
+	}
+}
+```
+For more advanced customizations, you can also register an arbitrary number of beans that implement ResourceConfigCustomizer.
+
+All the registered endpoints should be **@Components** with HTTP resource annotations (@GET and others).
+```
+@Component
+@Path("/hello")
+public class Endpoint {
+
+	@GET
+	public String message() {
+		return "Hello";
+	}
+
+}
+```
+
+### 27.4 Embedded Servlet Container Support
+Spring Boot includes support for embedded Tomcat, Jetty, and Undertow servers. 
+Most developers use the appropriate “Starter” to obtain a fully configured instance. 
+By default, the embedded server listens for HTTP requests on port 8080.
+
+#### 27.4.1 Servlets, Filters, and listeners
+Any Servlet, Filter, or servlet *Listener instance that is a Spring bean is registered with the embedded container. 
+This can be particularly convenient if you want to refer to a value from your application.properties during configuration.
+
+#### 27.4.2 Servlet Context Initialization
+When using an embedded container, automatic registration of classes annotated with **@WebServlet**, **@WebFilter**, and **@WebListener** can be enabled by using **@ServletComponentScan**.
+
+#### 27.4.3 The ServletWebServerApplicationContext
+**ServletWebServerApplicationContext** is a special type of WebApplicationContext that bootstraps itself by searching for a single ServletWebServerFactory bean.
+Usually a TomcatServletWebServerFactory, JettyServletWebServerFactory, or UndertowServletWebServerFactory has been auto-configured.
+
+#### 27.4.4 Customizing Embedded Servlet Containers
+Common servlet container settings can be configured by using Spring Environment properties. Usually, you would define the properties in your application.properties file.
+
+- Network settings: Listen port for incoming HTTP requests (server.port), interface address to bind to server.address, and so on.
+- Session settings: Whether the session is persistent (server.servlet.session.persistence), session timeout (server.servlet.session.timeout), location of session data (server.servlet.session.store-dir), and session-cookie configuration (server.servlet.session.cookie.*).
+- Error management: Location of the error page (server.error.path) and so on.
+- SSL
+- HTTP compression
+
+If you need to programmatically configure your embedded servlet container, you can register a Spring bean that implements the **WebServerFactoryCustomizer** interface. 
+If the preceding customization techniques are too limited, you can register the TomcatServletWebServerFactory, JettyServletWebServerFactory, or UndertowServletWebServerFactory bean yourself.
+
+### 28. Security
