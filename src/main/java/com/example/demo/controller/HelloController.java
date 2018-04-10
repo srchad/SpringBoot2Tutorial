@@ -24,7 +24,7 @@ public class HelloController {
     @Value("${hello.members}")
     private String[] members;
 
-    @GetMapping("/")
+    @GetMapping("/hello")
     public String test(){
         logger.info("test");
         return text;
