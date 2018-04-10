@@ -1,5 +1,6 @@
 package com.tistory.lky1001.boot2tutorial;
 
+import com.tistory.lky1001.boot2tutorial.handlers.UserHandler;
 import com.tistory.lky1001.boot2tutorial.listener.ApplicationEnvironmentPreparedEventListener;
 import com.tistory.lky1001.boot2tutorial.listener.ApplicationFailedEventListener;
 import com.tistory.lky1001.boot2tutorial.listener.ApplicationPreparedEventListener;
@@ -9,11 +10,22 @@ import com.tistory.lky1001.boot2tutorial.listener.ApplicationStartingEventListen
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.Banner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.config.EnableWebFlux;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.ServerResponse;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.web.reactive.function.server.RequestPredicates.DELETE;
+import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
+import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
+import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @SpringBootApplication
 public class Boot2tutorialApplication {
@@ -38,6 +50,15 @@ public class Boot2tutorialApplication {
 						new ApplicationStartedEventListener(),
 						new ApplicationStartingEventListener())
 				.run(args);
+	}
+
+	@Bean
+	public RouterFunction<ServerResponse> monoRouterFunction(@Autowired UserHandler userHandler) {
+        return route(GET("/mono/{user}").and(accept(APPLICATION_JSON)), userHandler::getUser)
+                .andRoute(GET("/mono/{user}/customers").and(accept(APPLICATION_JSON)), userHandler::getUserCustomers)
+                .andRoute(DELETE("/mono/{user}").and(accept(APPLICATION_JSON)), userHandler::deleteUser)
+				.andRoute(GET("/mono/{user}/details").and(accept(APPLICATION_JSON)), userHandler::getUserDetails)
+				.andRoute(GET("/mono/{user}/test").and(accept(APPLICATION_JSON)), userHandler::getUserDetailTest);
 	}
 
 	@Component
