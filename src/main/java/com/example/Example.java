@@ -25,14 +25,14 @@ public class Example {
         SpringApplication.run(Example.class, args);
     }
 
-    @Bean
-    public ApplicationRunner runner(final JdbcTemplate jdbcTemplate) {
-        return new ApplicationRunner() {
-            @Override
-            public void run(ApplicationArguments args) throws Exception {
-                Integer count = jdbcTemplate.queryForObject("select count(*) from Customers", Integer.class);
-                System.out.println("count : " + count);
-            }
-        };
-    }
+//    @Bean
+//    public ApplicationRunner runner(final JdbcTemplate jdbcTemplate) {
+//        return new ApplicationRunner() {
+//            @Override
+//            public void run(ApplicationArguments args) throws Exception {
+//                Integer count = jdbcTemplate.queryForObject("select count(*) from Customers", Integer.class);
+//                System.out.println("count : " + count);
+//            }
+//        };
+//    }
 }
