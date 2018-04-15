@@ -21,17 +21,21 @@
 * Tomcat container는 **tomcat-jdbc**를 제공함
 * DataSource는 **spring.datasource.*** 시작하는 외부 configuration properties로 컨트롤 됨.
 
-> spring.datasource.url=jdbc:mysql://localhost/test
-> spring.datasource.username=dbuser
-> spring.datasource.password=dbpass
-> spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+```properties
+spring.datasource.url=jdbc:mysql://localhost/test
+spring.datasource.username=dbuser
+spring.datasource.password=dbpass
+spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+```
 * 최소한 **spring.datasource.url**은 세팅해야함(Spring Boot tries to auto-configure an embedded database)
 * **driver-class-name** 사용안해도 됨(Spring Boot가 찾아줌)
 * [DataSourceProperties](https://github.com/spring-projects/spring-boot/blob/v2.0.1.RELEASE/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/jdbc/DataSourceProperties.java) - **spring.datasource.hikari.***, **spring.datasource.tomcat.***, **spring.datasource.dbcp2.***
 
-> spring.datasource.tomcat.max-wait=10000
-> spring.datasource.tomcat.max-active=50 
-> spring.datasource.tomcat.test-on-borrow=true
+```properties
+spring.datasource.tomcat.max-wait=10000
+spring.datasource.tomcat.max-active=50 
+spring.datasource.tomcat.test-on-borrow=true
+```
 
 ### 29.1.3 Connection to a JNDI DataSource
 > spring.datasource.jndi-name=java:jboss/datasources/customers
@@ -39,8 +43,8 @@
 ## 29.2 Using JdbcTemplate
 * **JdbcTemplate**, **NamedParameterJdbcTemplate**는 자동으로 설정됨 (**@Autowire**)
 
-<code>
-    import org.springframework.beans.factory.annotation.Autowired;
+```java
+import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.jdbc.core.JdbcTemplate;
     import org.springframework.stereotype.Component;
     
@@ -57,7 +61,8 @@
         // ...
     
 }
-</code>
+```
+
 
 ## 29.3 JPA and “Spring Data”
 * **spring-boot-starter-data-jpa** : Hibernate, Spring Data JPA, Spring ORMs
@@ -68,4 +73,117 @@
 * **@Entity**, **@Embeddable**, or **@MappedSuperclass**
 
 ### 29.3.2 Spring Data JPA Repositories
+*  **Repository** or **CrudRepository** 상속받음
+```java
+package com.example.myapp.domain;
+
+import org.springframework.data.domain.*;
+import org.springframework.data.repository.*;
+
+public interface CityRepository extends Repository<City, Long> {
+
+	Page<City> findAll(Pageable pageable);
+
+	City findByNameAndCountryAllIgnoringCase(String name, String country);
+
+}
+```
+
+### 29.3.3 Creating and Dropping JPA Databases
+* **spring.jpa.hibernate.ddl-auto=create-drop**
+* **spring.jpa.properties.hibernate.hbm2ddl.auto=create-drop**
+* **spring.jpa.properties.hibernate.globally_quoted_identifiers=true**
+
+### 29.3.4 Open EntityManager in View
+* **spring.jpa.open-in-view=false**
+
+## 29.4 Using H2’s Web Console
+* web application
+* **com.h2database:h2** classpath에 있어야 함
+* **spring-boot-devtools**
+
+### 29.4.1 Changing the H2 Console’s Path
+* **/h2-console** 기본 콘솔 경로
+* **spring.h2.console.path**
+
+## 29.5 Using jOOQ
+* Java Object Oriented Querying ([jOOQ](http://www.jooq.org/))
+* [Data Geekery](http://www.datageekery.com/)
+
+### 29.5.1 Code Generation
+```xml
+<plugin>
+	<groupId>org.jooq</groupId>
+	<artifactId>jooq-codegen-maven</artifactId>
+	<executions>
+		...
+	</executions>
+	<dependencies>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>${h2.version}</version>
+		</dependency>
+	</dependencies>
+	<configuration>
+		<jdbc>
+			<driver>org.h2.Driver</driver>
+			<url>jdbc:h2:~/yourdatabase</url>
+		</jdbc>
+		<generator>
+			...
+		</generator>
+	</configuration>
+</plugin>
+```
+
+### 29.5.2 Using DSLContext
+```java
+@Component
+public class JooqExample implements CommandLineRunner {
+
+	private final DSLContext create;
+
+	@Autowired
+	public JooqExample(DSLContext dslContext) {
+		this.create = dslContext;
+	}
+
+}
+```
+```java
+public List<GregorianCalendar> authorsBornAfter1980() {
+	return this.create.selectFrom(AUTHOR)
+		.where(AUTHOR.DATE_OF_BIRTH.greaterThan(new GregorianCalendar(1980, 0, 1)))
+		.fetch(AUTHOR.DATE_OF_BIRTH);
+}
+```
+
+# 30. Working with NoSQL Technologies
+
+## 
+* cache, message broker, and richly-featured key-value store
+*  Spring Boot는 Lettuce, Jedis client libraries 제공
+* **spring-boot-starter-data-redis**
+* **spring-boot-starter-data-redis-reactive**
+
+### 30.1.1 Connecting to Redis
+* **RedisConnectionFactory**, **StringRedisTemplate**, **RedisTemplate** 스프링 빈으로 자동으로 설정
+* Redis server at **localhost:6379**
+```java
+@Component
+public class MyBean {
+
+	private StringRedisTemplate template;
+
+	@Autowired
+	public MyBean(StringRedisTemplate template) {
+		this.template = template;
+	}
+
+	// ...
+
+}
+```
+* **commons-pool2** classpath에 있으면 pooled connection factory 사용함
 
