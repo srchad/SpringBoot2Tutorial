@@ -32,3 +32,38 @@
 > spring.datasource.tomcat.max-wait=10000
 > spring.datasource.tomcat.max-active=50 
 > spring.datasource.tomcat.test-on-borrow=true
+
+### 29.1.3 Connection to a JNDI DataSource
+> spring.datasource.jndi-name=java:jboss/datasources/customers
+
+## 29.2 Using JdbcTemplate
+* **JdbcTemplate**, **NamedParameterJdbcTemplate**는 자동으로 설정됨 (**@Autowire**)
+
+<code>
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.jdbc.core.JdbcTemplate;
+    import org.springframework.stereotype.Component;
+    
+    @Component
+    public class MyBean {
+    
+        private final JdbcTemplate jdbcTemplate;
+    
+        @Autowired
+        public MyBean(JdbcTemplate jdbcTemplate) {
+            this.jdbcTemplate = jdbcTemplate;
+        }
+    
+        // ...
+    
+}
+</code>
+
+## 29.3 JPA and “Spring Data”
+* **spring-boot-starter-data-jpa** : Hibernate, Spring Data JPA, Spring ORMs
+
+### 29.3.1 Entity Classes
+* Spring Boot는 **persistence.xml** 필요없이 “Entity Scanning”
+* **@EnableAutoConfiguration** or **@SpringBootApplication** 서치
+* **@Entity**, **@Embeddable**, or **@MappedSuperclass**
+
