@@ -67,3 +67,5 @@
 * **@EnableAutoConfiguration** or **@SpringBootApplication** 서치
 * **@Entity**, **@Embeddable**, or **@MappedSuperclass**
 
+### 29.3.2 Spring Data JPA Repositories
+
