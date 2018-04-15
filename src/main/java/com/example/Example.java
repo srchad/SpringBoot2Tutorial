@@ -1,7 +1,11 @@
 package com.example;
 
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,5 +23,16 @@ public class Example {
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(Example.class, args);
+    }
+
+    @Bean
+    public ApplicationRunner runner(final JdbcTemplate jdbcTemplate) {
+        return new ApplicationRunner() {
+            @Override
+            public void run(ApplicationArguments args) throws Exception {
+                Integer count = jdbcTemplate.queryForObject("select count(*) from Customers", Integer.class);
+                System.out.println("count : " + count);
+            }
+        };
     }
 }
