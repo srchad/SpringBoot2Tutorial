@@ -23,15 +23,15 @@ public class MemberRepositoryTest {
         chris.setName("chris");
         chris.setAge(38);
         chris.setAddress("Suwon");
-        memberRepository.save(chris);
+        memberRepository.save(chris).block();
 
         Member genos = new Member();
         genos.setName("genos");
         genos.setAge(30);
         genos.setAddress("Seoul");
-        memberRepository.save(genos);
+        memberRepository.save(genos).block();
 
-        List<Member> memberList = memberRepository.getMemberByName("chris");
+        List<Member> memberList = memberRepository.getMemberByName("chris").collectList().block();
 
         memberList.forEach(member -> {
             System.out.println(member);

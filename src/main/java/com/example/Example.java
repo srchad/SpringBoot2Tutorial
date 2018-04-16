@@ -17,19 +17,8 @@ import javax.annotation.Resources;
 @SpringBootApplication
 public class Example {
 
-    @Autowired
-    MemberRepository memberRepository;
-
     public static void main(String[] args) throws Exception {
         SpringApplication.run(Example.class, args);
     }
 
-    @Bean
-    public ApplicationRunner applicationRunner() {
-        return args -> {
-            memberRepository.getMemberByName("chris").forEach(member -> {
-                System.out.println(member);
-            });
-        };
-    }
 }
