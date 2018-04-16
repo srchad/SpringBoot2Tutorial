@@ -1,5 +1,7 @@
 package com.example;
 
+import com.example.myapp.repository.MemberRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -12,27 +14,22 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.annotation.Resources;
 
-@RestController
 @SpringBootApplication
 public class Example {
 
-    @RequestMapping("/")
-    String home() {
-        return "Spring Boot!";
-    }
+    @Autowired
+    MemberRepository memberRepository;
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(Example.class, args);
     }
 
-//    @Bean
-//    public ApplicationRunner runner(final JdbcTemplate jdbcTemplate) {
-//        return new ApplicationRunner() {
-//            @Override
-//            public void run(ApplicationArguments args) throws Exception {
-//                Integer count = jdbcTemplate.queryForObject("select count(*) from Customers", Integer.class);
-//                System.out.println("count : " + count);
-//            }
-//        };
-//    }
+    @Bean
+    public ApplicationRunner applicationRunner() {
+        return args -> {
+            memberRepository.getMemberByName("chris").forEach(member -> {
+                System.out.println(member);
+            });
+        };
+    }
 }

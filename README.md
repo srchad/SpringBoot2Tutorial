@@ -161,7 +161,7 @@ public List<GregorianCalendar> authorsBornAfter1980() {
 
 # 30. Working with NoSQL Technologies
 
-## 
+## 30.1 Redis
 * cache, message broker, and richly-featured key-value store
 *  Spring Boot는 Lettuce, Jedis client libraries 제공
 * **spring-boot-starter-data-redis**
@@ -187,3 +187,86 @@ public class MyBean {
 ```
 * **commons-pool2** classpath에 있으면 pooled connection factory 사용함
 
+## 30.2 MongoDB
+* **spring-boot-starter-data-mongodb**
+* **spring-boot-starter-data-mongodb-reactive**
+
+### 30.2.1 Connecting to a MongoDB Database
+* **org.springframework.data.mongodb.MongoDbFactory**
+* 기본적으로 MongoDB server **mongodb://localhost/test** 접속함
+```java
+import org.springframework.data.mongodb.MongoDbFactory;
+import com.mongodb.DB;
+
+@Component
+public class MyBean {
+
+	private final MongoDbFactory mongo;
+
+	@Autowired
+	public MyBean(MongoDbFactory mongo) {
+		this.mongo = mongo;
+	}
+
+	// ...
+
+	public void example() {
+		MongoDatabase db = mongo.getDb();
+		// ...
+	}
+}
+```
+* Mongo 3.0 이상
+```properties
+spring.data.mongodb.uri=mongodb://user:secret@mongo1.example.com:12345,mongo2.example.com:23456/test
+```
+
+* Mongo 2.x 에서는 **host**/**port** 설정해야함
+``` properties
+spring.data.mongodb.host=mongoserver
+spring.data.mongodb.port=27017
+```
+
+### 30.2.2 MongoTemplate
+* Spring Data MongoDB는 [MongoTemplate](https://docs.spring.io/spring-data/mongodb/docs/current/api/org/springframework/data/mongodb/core/MongoTemplate.html) 제공함(spring의 **JdbcTemplate**)
+```java
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyBean {
+
+	private final MongoTemplate mongoTemplate;
+
+	@Autowired
+	public MyBean(MongoTemplate mongoTemplate) {
+		this.mongoTemplate = mongoTemplate;
+	}
+
+	// ...
+
+}
+```
+
+### 30.2.3 Spring Data MongoDB Repositories
+
+```java
+package com.example.myapp.domain;
+
+import org.springframework.data.domain.*;
+import org.springframework.data.repository.*;
+
+public interface CityRepository extends Repository<City, Long> {
+
+	Page<City> findAll(Pageable pageable);
+
+	City findByNameAndCountryAllIgnoringCase(String name, String country);
+
+}
+```
+
+### 30.2.4 Embedded Mongo
+* **de.flapdoodle.embed:de.flapdoodle.embed.mongo**
+* **spring.data.mongodb.port** (랜덤 port를 줄려면 값을 0으로)
+* SLF4J가 클래스패스에 있으면 **org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongo**
