@@ -270,3 +270,74 @@ public interface CityRepository extends Repository<City, Long> {
 * **de.flapdoodle.embed:de.flapdoodle.embed.mongo**
 * **spring.data.mongodb.port** (랜덤 port를 줄려면 값을 0으로)
 * SLF4J가 클래스패스에 있으면 **org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongo**
+
+
+## 30.3 Neo4j
+* **spring-boot-starter-data-neo4j**
+
+### 30.3.1 Connecting to a Neo4j Database
+* **Neo4jSession**, **Session**, **Neo4jOperations**
+* **localhost:7474**
+```java
+@Component
+public class MyBean {
+
+	private final Neo4jTemplate neo4jTemplate;
+
+	@Autowired
+	public MyBean(Neo4jTemplate neo4jTemplate) {
+		this.neo4jTemplate = neo4jTemplate;
+	}
+
+	// ...
+
+}
+```
+```properties
+spring.data.neo4j.uri=http://my-server:7474
+spring.data.neo4j.username=neo4j
+spring.data.neo4j.password=secret
+```
+
+### 30.3.2 Using the Embedded Mode
+* **org.neo4j:neo4j-ogm-embedded-driver**
+* **spring.data.neo4j.embedded.enabled=false** persistence룰 사용할 수 있다
+```properties
+spring.data.neo4j.uri=file://var/tmp/graph.db
+```
+
+### 30.3.3 Neo4jSession
+* Open Session in View
+```properties
+spring.data.neo4j.open-in-view=false
+```
+
+### 30.3.4 Spring Data Neo4j Repositories
+* JPA **@Entity** 대신에 Neo4j OGM **@NodeEntity**
+* repository(@Transactional) 사용하려면 애노테이션 추가해야함
+```java
+@EnableNeo4jRepositories(basePackages = "com.example.myapp.repository")
+@EnableTransactionManagement
+```
+
+### 30.3.5 Repository Example
+```java
+package com.example.myapp.domain;
+
+import org.springframework.data.domain.*;
+import org.springframework.data.repository.*;
+
+public interface CityRepository extends Neo4jRepository<City> {
+
+	Page<City> findAll(Pageable pageable);
+
+	City findByNameAndCountry(String name, String country);
+
+}
+
+```
+
+
+
+
+

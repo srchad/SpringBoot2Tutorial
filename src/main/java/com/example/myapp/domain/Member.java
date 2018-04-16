@@ -1,13 +1,14 @@
 package com.example.myapp.domain;
 
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.neo4j.ogm.annotation.GeneratedValue;
+import org.neo4j.ogm.annotation.Id;
+import org.neo4j.ogm.annotation.NodeEntity;
 
-import javax.persistence.Id;
-
-@Document
+@NodeEntity
 public class Member {
 
     @Id
+    @GeneratedValue
     private String id;
     private String name;
     private int age;
