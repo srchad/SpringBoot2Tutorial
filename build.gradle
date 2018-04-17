@@ -11,14 +11,25 @@ jar {
 
 repositories {
 	jcenter()
+	maven { url "https://code.lds.org/nexus/content/groups/main-repo"} // 오라클
 }
 
 dependencies {
+    // spring
 	compile("org.springframework.boot:spring-boot-starter-web")
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	compile('org.springframework.boot:spring-boot-starter-data-redis')
+	compile 'com.oracle:ojdbc6:11.2.0.3'
+	compile 'com.google.guava:guava:14.0.1'
+	compile("org.springframework.boot:spring-boot-starter-data-redis")
+	//optional "org.springframework.boot:spring-boot-configuration-processor"
 	testCompile("org.springframework.boot:spring-boot-starter-test")
 }
 
 apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+
+//compileJava.dependsOn(processResources)
+
 
