@@ -337,6 +337,391 @@ public interface CityRepository extends Neo4jRepository<City> {
 
 ```
 
+## 30.4 Gemfire
+* [Pivotal Gemfire](https://pivotal.io/kr/pivotal-gemfire) data management platform
+* **spring-boot-starter-data-gemfire**
+* no auto-configuration
+* **@EnableGemfireRepositories** Spring Data Repositories 사용가능
+
+## 30.5 Solr
+* search engine
+* [Spring Data Solr](https://github.com/spring-projects/spring-data-solr)
+* **spring-boot-starter-data-solr**
+
+### 30.5.1 Connecting to Solr
+* **localhost:8983/solr**
+```java
+@Component
+public class MyBean {
+
+	private SolrClient solr;
+
+	@Autowired
+	public MyBean(SolrClient solr) {
+		this.solr = solr;
+	}
+
+	// ...
+
+}
+```
+
+### 30.5.2 Spring Data Solr Repositories
+* **@SolrDocument** (JPA @Entity)
+
+## 30.6 Elasticsearch
+* **spring-boot-starter-data-elasticsearch**
+* [Jest](https://github.com/searchbox-io/Jest) Spring Boot가 지원함
+
+### 30.6.1 Connecting to Elasticsearch by Using Jest
+* **localhost:9200** 
+* **JestClient**
+```properties
+spring.elasticsearch.jest.uris=http://search.example.com:9200
+spring.elasticsearch.jest.read-timeout=10000
+spring.elasticsearch.jest.username=user
+spring.elasticsearch.jest.password=secret
+```
+* **HttpClientConfigBuilderCustomizer**를 통해 추가 HTTP 설정을 할 수 있다.
+```java
+static class HttpSettingsCustomizer implements HttpClientConfigBuilderCustomizer {
+
+	@Override
+	public void customize(HttpClientConfig.Builder builder) {
+		builder.maxTotalConnection(100).defaultMaxTotalConnectionPerRoute(5);
+	}
+
+}
+```
+
+### 30.6.2 Connecting to Elasticsearch by Using Spring Data
+* Elasticsearch에 연결하려면 하나 이상의 클러스터 노드 주소를 입력해야함
+* **ElasticsearchTemplate** or **TransportClient**
+```properties
+spring.data.elasticsearch.cluster-nodes=localhost:9300
+```
+```java
+@Component
+public class MyBean {
+
+	private final ElasticsearchTemplate template;
+
+	public MyBean(ElasticsearchTemplate template) {
+		this.template = template;
+	}
+
+	// ...
+
+}
+```
+
+### 30.6.3 Spring Data Elasticsearch Repositories
+* **@Document** (JPA @Entity)
+
+## 30.7 Cassandra
+* **spring-boot-starter-data-cassandra**
+
+30.7.1 Connecting to Cassandra
+* **CassandraTemplate** or Cassandra **Session**
+```properties
+spring.data.cassandra.keyspace-name=mykeyspace
+spring.data.cassandra.contact-points=cassandrahost1,cassandrahost2
+```
+```java
+@Component
+public class MyBean {
+
+	private CassandraTemplate template;
+
+	@Autowired
+	public MyBean(CassandraTemplate template) {
+		this.template = template;
+	}
+
+	// ...
+
+}
+```
+
+### 30.7.2 Spring Data Cassandra Repositories
+* **@Query**
+
+## 30.8 Couchbase
+* **spring-boot-starter-data-couchbase** and **spring-boot-starter-data-couchbase-reactive**
+
+### 30.8.1 Connecting to Couchbase
+```properties
+spring.couchbase.bootstrap-hosts=my-host-1,192.168.1.123
+spring.couchbase.bucket.name=my-bucket
+spring.couchbase.bucket.password=secret
+```
+* 새로운 **Bucket**을 여는데 사용할 시간과 SSL support를 활성화 함
+```properties
+spring.couchbase.env.timeouts.connect=3000
+spring.couchbase.env.ssl.key-store=/location/of/keystore.jks
+spring.couchbase.env.ssl.key-store-password=secret
+```
+
+### 30.8.2 Spring Data Couchbase Repositories
+* [reference documentation](https://docs.spring.io/spring-data/couchbase/docs/current/reference/html/)
+```java
+@Component
+public class MyBean {
+
+	private final CouchbaseTemplate template;
+
+	@Autowired
+	public MyBean(CouchbaseTemplate template) {
+		this.template = template;
+	}
+
+	// ...
+
+}
+```
+
+## 30.9 LDAP
+* in-memory LDAP server [UnboundID](https://www.ldap.com/unboundid-ldap-sdk-for-java) 지원
+* **spring-boot-starter-data-ldap**
+
+### 30.9.1 Connecting to an LDAP Server
+```properties
+spring.ldap.urls=ldap://myserver:1235
+spring.ldap.username=admin
+spring.ldap.password=secret
+```
+
+### 30.9.2 Spring Data LDAP Repositories
+* **LdapTemplate**
+```java
+@Component
+public class MyBean {
+
+	private final LdapTemplate template;
+
+	@Autowired
+	public MyBean(LdapTemplate template) {
+		this.template = template;
+	}
+
+	// ...
+
+}
+```
+
+### 30.9.3 Embedded In-memory LDAP Server
+* **com.unboundid:unboundid-ldapsdk**
+```properties
+spring.ldap.embedded.base-dn=dc=spring,dc=io
+```
+
+## 30.10 InfluxDB
+* Time-series DB : 시계열 데이터를 저장하고 활용하는데에 특화된 database
+* Time-series : 인플럭스DB가 주로 매트릭스나 이벤트를 처리하며, 이를 실시간 분석하는 역할을 한다는 의미
+* Time-series 데이터 검색을 위해 최적화 된 시계열 데이터베이스
+
+### 30.10.1 Connecting to InfluxDB
+```properties
+spring.influx.url=http://172.0.0.1:8086
+```
+
+# 31. Caching
+* **@EnableCaching** 애노테이션이 활성화 되어있으면 자동으로 구성
+```java
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.stereotype.Component;
+
+@Component
+public class MathService {
+
+	@Cacheable("piDecimals")
+	public int computePiDecimal(int i) {
+		// ...
+	}
+
+}
+```
+* **computePiDecimal**을 호출하기 전에 **piDecimals** 캐시에서 i 인수와 같은값을 찾음
+* i 인수의 값을 찾으면 메소드 호출없이 리턴
+* 값이 없으면 메소드가 호출되고 캐시가 업데이트 됨
+* JSR-107 (JCache) 애노테이션인 **@CacheResult** 사용가능
+* Spring Cache와 JCache annotations 혼합해서 사용하지 마라
+
+## 31.1 Supported Cache Providers
+* 실제 저장소를 제공하지 않음
+* **org.springframework.cache.Cache**, **org.springframework.cache.CacheManager** 인터페이스
+* **CacheManager**, **CacheResolver** 빈이 정의되어있지 않으면, Spring Boot는 다음순서로 provider를 찾는다
+1. Generic
+2. JCache (JSR-107) (EhCache 3, Hazelcast, Infinispan, and others)
+3. EhCache 2.x
+4. Hazelcast
+5. Infinispan
+6. Couchbase
+7. Redis
+8. Caffeine
+9. Simple
+* **spring-boot-starter-cache**
+
+```java
+@Bean
+public CacheManagerCustomizer<ConcurrentMapCacheManager> cacheManagerCustomizer() {
+	return new CacheManagerCustomizer<ConcurrentMapCacheManager>() {
+		@Override
+		public void customize(ConcurrentMapCacheManager cacheManager) {
+			cacheManager.setAllowNullValues(false);
+		}
+	};
+}
+```
+
+### 31.1.1 Generic
+* **org.springframework.cache.Cache** bean이 하나라도 정의되어에 일반 캐싱이 사용됨
+
+### 31.1.2 JCache (JSR-107)
+* **JCacheCacheManager**는 **spring-boot-starter-cache**에 의해 제공
+```properties
+ # Only necessary if more than one provider is present
+spring.cache.jcache.provider=com.acme.MyCachingProvider
+spring.cache.jcache.config=classpath:acme.xml
+```
+
+* **javax.cache.cacheManager**를 정의하는 두가지 방법
+1. **spring.cache.cache-names** 프로퍼티에 세팅. **javax.cache.configuration.Configuration** 빈이 정의되어있으면 커스터마이즈 할때 사용 됨
+2. **org.springframework.boot.autoconfigure.cache.JCacheManagerCustomizer** 빈은 **CacheManager** 레퍼런스되 호출 됨
+
+
+### 31.1.3 EhCache 2.x
+* **ehcache.xml** 클래스패스에 있으면 사용됨
+```properties
+spring.cache.ehcache.config=classpath:config/another-config.xml
+```
+
+### 31.1.4 Hazelcast
+[general support for Hazelcast](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-hazelcast)
+
+### 31.1.5 Infinispan
+* 기본설정파일 위치가 없으므로 명시적으로 지정해야함. 그렇지 않으면 디폴트 bootstrap이 사용
+
+```properties
+spring.cache.infinispan.config=infinispan.xml
+```
+* Spring Boot에서는 임베디드 모드로 제한
+
+### 31.1.6 Couchbase
+* main **Bucket**에 두개의 캐시(cache1, cache2), 2초뒤에 다른 **Bucket**에있는 cache3 실행
+```properties
+spring.cache.cache-names=cache1,cache2
+```
+```java
+@Configuration
+public class CouchbaseCacheConfiguration {
+
+	private final Cluster cluster;
+
+	public CouchbaseCacheConfiguration(Cluster cluster) {
+		this.cluster = cluster;
+	}
+
+	@Bean
+	public Bucket anotherBucket() {
+		return this.cluster.openBucket("another", "secret");
+	}
+
+	@Bean
+	public CacheManagerCustomizer<CouchbaseCacheManager> cacheManagerCustomizer() {
+		return c -> {
+			c.prepareCache("cache3", CacheBuilder.newInstance(anotherBucket())
+					.withExpiration(2));
+		};
+	}
+
+}
+```
+
+### 31.1.7 Redis
+* configuration 생성할때 cache1 생성 후 10분뒤에 cache2 생성
+```properties
+spring.cache.cache-names=cache1,cache2
+spring.cache.redis.time-to-live=600000
+```
+
+### 31.1.8 Caffeine
+* 다음중 하나로 사용자 정의 할 수 있음
+1. **spring.cache.caffeine.spec**에 정의 spec
+2. **com.github.benmanes.caffeine.cache.CaffeineSpec** bean
+3. **com.github.benmanes.caffeine.cache.Caffeine** bean
+
+```properties
+spring.cache.cache-names=cache1,cache2
+spring.cache.caffeine.spec=maximumSize=500,expireAfterAccess=600s
+```
+
+### 31.1.9 Simple
+* 다른 provider가 발견되지 않으면, cache store에 정의된 **ConcurrentHashMap** 설정
+* 애플리케이션에 캐싱 라이브러리가 없으면 기본값이 됨
+```properties
+spring.cache.cache-names=cache1,cache2
+```
+
+### 31.1.10 None
+* 특정 환경에서 캐싱을 사용하지 않을 경우
+```properties
+spring.cache.type=none
+```
+
+### 예제
+* **@Cacheable** 속성 : 
+1. value : 캐시 이름
+2. key : 캐시 키
+3. condition : 특정 조건을 넣어서 상황에 따라 캐시를 할지 하지 않을지 결정
+4. keyGenerator, cacheManager...
+```java
+@Cacheable(value = "wonwoo", condition = "#name.length() < 10")
+public String find(String name) {
+  logger.info("cache find .. {}", name);
+  return name;
+}
+```
+* 캐시명은 wonwoo가 되고 key는 name, 파라미터(name)길이가 10보다 작을 때만 캐시를 함
+```java
+@Cacheable(key = "#name", value = "wonwoo", condition = "#name.length() < 10")
+```
+
+* **@CacheEvict** : 캐시 데이터를 삭제할 때
+```java
+@CacheEvict(key = "#name", value = "wonwoo")
+public String update(String name) {
+  logger.info("cache update .. {}", name);
+  return name;
+}
+```
+* 모든 캐시들을 지울려면
+```java
+@CacheEvict(key = "#name", value = "wonwoo", allEntries = true)
+```
+
+* **@CachePut** : 매번 메서드를 호출. 호출과 동시에 캐시에 보관하므로 보통 저장할 때 용이
+```java
+@CachePut(key = "#name", value = "wonwoo")
+public String save(String name) {
+  logger.info("cache save .. {}", name);
+  return name;
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,25 +1,22 @@
 package com.example.myapp.domain;
 
-import org.neo4j.ogm.annotation.GeneratedValue;
-import org.neo4j.ogm.annotation.Id;
-import org.neo4j.ogm.annotation.NodeEntity;
+import org.springframework.stereotype.Component;
 
-@NodeEntity
+@Component
 public class Member {
 
-    @Id
-    @GeneratedValue
-    private String id;
     private String name;
     private int age;
     private String address;
 
-    public String getId() {
-        return id;
+    public Member() {
+
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public Member(String name, int age, String address) {
+        this.name = name;
+        this.age = age;
+        this.address = address;
     }
 
     public String getName() {
@@ -49,8 +46,7 @@ public class Member {
     @Override
     public String toString() {
         return "Member{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
+                "name='" + name + '\'' +
                 ", age=" + age +
                 ", address='" + address + '\'' +
                 '}';
