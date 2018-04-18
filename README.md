@@ -41,7 +41,7 @@ spring.datasource.tomcat.test-on-borrow=true
 > spring.datasource.jndi-name=java:jboss/datasources/customers
 
 ## 29.2 Using JdbcTemplate
-* **JdbcTemplate**, **NamedParameterJdbcTemplate**는 자동으로 설정됨 (**@Autowire**)
+* **JdbcTemplate**, **NamedParameterJdbcTemplate**은 자동으로 설정됨
 
 ```java
 import org.springframework.beans.factory.annotation.Autowired;
