@@ -8,6 +8,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 @Configuration
 public class RedisConfiguration {
 
+    // TODO : 런타임 오류 남
+    /*
     @Bean
     JedisConnectionFactory jedisConnectionFactory() {
         JedisConnectionFactory factory = new JedisConnectionFactory();
@@ -21,5 +23,6 @@ public class RedisConfiguration {
         redisTemplate.setConnectionFactory(jedisConnectionFactory());
         return redisTemplate;
     }
+    */
 
 }

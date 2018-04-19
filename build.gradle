@@ -22,6 +22,8 @@ dependencies {
 	compile 'com.oracle:ojdbc6:11.2.0.3'
 	compile 'com.google.guava:guava:14.0.1'
 	compile("org.springframework.boot:spring-boot-starter-data-redis")
+	compile 'org.apache.httpcomponents:httpclient:4.4'
+	compile("org.springframework.boot:spring-boot-starter-webflux")
 	//optional "org.springframework.boot:spring-boot-configuration-processor"
 	testCompile("org.springframework.boot:spring-boot-starter-test")
 }
