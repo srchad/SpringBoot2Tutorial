@@ -24,3 +24,23 @@
 1. customization 범위을 최소화 화려면 **WebClient.Builder **의 method를 호출하는 방식으로 customization
 2. application 수준으로 하려면 **WebClientCustomizer** 사용
 3. **WebClient.create()**로 빈생성해서 자체적으로 사용 => auto-configuration off
+
+
+
+# 43. Testing
+
+
+## 43.1 Test Scope Dependencies
+
+** spring-boot-starter-test 는 다음 라이브러리들을 포함 
+- JUnit: The de-facto standard for unit testing Java applications.
+- Spring Test & Spring Boot Test: Utilities and integration test support for Spring Boot applications.
+- AssertJ: A fluent assertion library.
+- Hamcrest: A library of matcher objects (also known as constraints or predicates).
+- Mockito: A Java mocking framework.
+- JSONassert: An assertion library for JSON.
+- JsonPath: XPath for JSON.
+
+
+## 43.3 Testing Spring Boot Applications
+* http://meetup.toast.com/posts/124

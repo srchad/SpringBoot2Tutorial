@@ -1,0 +1,17 @@
+app:
+  name: DanielApp
+  description : ${app.name} is a Spring Boot application
+
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@10.41.116.15:1521/DEVBIZ05
+    username: tclix
+    password: tclixdb
+    driver-class-name: oracle.jdbc.OracleDriver
+  redis:
+    host-name: 31122.rc2-clixapi.service.mokdong.consul
+    port: 31122
+    password: 8f194a6f7fff450e94370c410a66530b
