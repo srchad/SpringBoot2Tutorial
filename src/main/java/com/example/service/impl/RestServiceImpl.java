@@ -19,7 +19,7 @@ public class RestServiceImpl implements RestService{
 
 
     public RestServiceImpl(RestTemplateBuilder restTemplateBuilder, WebClient.Builder webClientBuilder) {
-        this.restTemplate = restTemplateBuilder.build();
+        this.restTemplate = restTemplateBuilder.basicAuthorization("a", "b").setConnectTimeout(10000).build();
         this.webClient = webClientBuilder.baseUrl("http://clix-internal-api.dev.biz.daum.net:8080").build();
     }
 

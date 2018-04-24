@@ -1,16 +1,21 @@
 package com.example.controller;
 
+import static org.mockito.BDDMockito.given;
+
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.example.Example;
 import com.example.model.ApiResponse;
 import com.example.model.InicisMember;
+import com.example.repository.InicisMemberRepository;
 import com.example.service.InicisApiService;
 
 @RunWith(SpringRunner.class)
@@ -24,6 +29,8 @@ public class ControllerTest {
     @Autowired
     private InicisApiController inicisApiController;
 
+    //@MockBean
+    //private InicisMemberRepository repository;
 
     @Test
     public void testController() {
@@ -43,6 +50,15 @@ public class ControllerTest {
         }
 
 
+    }
+
+    @Test
+    public void testFindFromDB() {
+        List<InicisMember> expected = Arrays.asList(
+                new InicisMember(),
+                new InicisMember());
+
+        //given(repository.findAll()).willReturn(expected);
     }
 
 }
