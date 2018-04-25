@@ -709,11 +709,245 @@ public String save(String name) {
 }
 ```
 
+# 32. Messaging
 
+## 32.1 JMS
+* **javax.jms.ConnectionFactory**
 
+### 32.1.1 ActiveMQ Support
+* **spring-boot-starter-activemq**
+```properties
+spring.activemq.broker-url=tcp://192.168.1.210:9876
+spring.activemq.user=admin
+spring.activemq.password=secret
+```
 
+* **org.apache.activemq:activemq-pool** 
+* **PooledConnectionFactory**
+```properties
+spring.activemq.pool.enabled=true
+spring.activemq.pool.max-connections=50
+```
 
+### 32.1.2 Artemis Support
+* **spring-boot-starter-artemis**
+* **org.apache.activemq:artemis-jms-server** 애플리케이션에 추가하면 임베디드 모드로 사용
+```properties
+spring.artemis.mode=native
+spring.artemis.host=192.168.1.210
+spring.artemis.port=9876
+spring.artemis.user=admin
+spring.artemis.password=secret
+```
 
+### 32.1.3 Using a JNDI ConnectionFactory
+* 애플리케이션 서버에서 애플리케이션이 러닝 중이면 **JNDI**를 사용하는 **ConnectionFactory**를 찾음
+* **java:/JmsXA**, **java:/XAConnectionFactory** 에서 확인
+```properties
+spring.jms.jndi-name=java:/MyConnectionFactory
+```
+
+### 32.1.4 Sending a Message
+```java
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyBean {
+
+	private final JmsTemplate jmsTemplate;
+
+	@Autowired
+	public MyBean(JmsTemplate jmsTemplate) {
+		this.jmsTemplate = jmsTemplate;
+	}
+
+	// ...
+
+}
+```
+
+### 32.1.5 Receiving a Message
+* **@JmsListener**
+```java
+@Component
+public class MyBean {
+
+	@JmsListener(destination = "someQueue")
+	public void processMessage(String content) {
+		// ...
+	}
+
+}
+```
+
+* **MessageConverter**
+```java
+@Configuration
+static class JmsConfiguration {
+
+	@Bean
+	public DefaultJmsListenerContainerFactory myFactory(
+			DefaultJmsListenerContainerFactoryConfigurer configurer) {
+		DefaultJmsListenerContainerFactory factory =
+				new DefaultJmsListenerContainerFactory();
+		configurer.configure(factory, connectionFactory());
+		factory.setMessageConverter(myMessageConverter());
+		return factory;
+	}
+
+}
+```
+
+* **@JmsListener**
+```java
+@Component
+public class MyBean {
+
+	@JmsListener(destination = "someQueue", containerFactory="myFactory")
+	public void processMessage(String content) {
+		// ...
+	}
+
+}
+```
+
+## 32.2 AMQP
+* Advanced Message Queuing Protocol 
+* **spring-boot-starter-amqp**
+
+### 32.2.1 RabbitMQ support
+```properties
+spring.rabbitmq.host=localhost
+spring.rabbitmq.port=5672
+spring.rabbitmq.username=admin
+spring.rabbitmq.password=secret
+```
+
+### 32.2.2 Sending a Message
+```java
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyBean {
+
+	private final AmqpAdmin amqpAdmin;
+	private final AmqpTemplate amqpTemplate;
+
+	@Autowired
+	public MyBean(AmqpAdmin amqpAdmin, AmqpTemplate amqpTemplate) {
+		this.amqpAdmin = amqpAdmin;
+		this.amqpTemplate = amqpTemplate;
+	}
+
+	// ...
+
+}
+```
+
+### 32.2.3 Receiving a Message
+```java
+@Component
+public class MyBean {
+
+	@RabbitListener(queues = "someQueue")
+	public void processMessage(String content) {
+		// ...
+	}
+
+}
+```
+
+* **MessageConverter**
+```java
+@Configuration
+static class RabbitConfiguration {
+
+	@Bean
+	public SimpleRabbitListenerContainerFactory myFactory(
+			SimpleRabbitListenerContainerFactoryConfigurer configurer) {
+		SimpleRabbitListenerContainerFactory factory =
+				new SimpleRabbitListenerContainerFactory();
+		configurer.configure(factory, connectionFactory);
+		factory.setMessageConverter(myMessageConverter());
+		return factory;
+	}
+
+}
+```
+
+* **@RabbitListener**
+```java
+@Component
+public class MyBean {
+
+	@RabbitListener(queues = "someQueue", containerFactory="myFactory")
+	public void processMessage(String content) {
+		// ...
+	}
+
+}
+```
+
+## 32.3 Apache Kafka Support
+```properties
+spring.kafka.bootstrap-servers=localhost:9092
+spring.kafka.consumer.group-id=myGroup
+```
+
+### 32.3.1 Sending a Message
+```java
+@Component
+public class MyBean {
+
+	private final KafkaTemplate kafkaTemplate;
+
+	@Autowired
+	public MyBean(KafkaTemplate kafkaTemplate) {
+		this.kafkaTemplate = kafkaTemplate;
+	}
+
+	// ...
+
+}
+```
+
+### 32.3.2 Receiving a Message
+```java
+@Component
+public class MyBean {
+
+	@KafkaListener(topics = "someTopic")
+	public void processMessage(String content) {
+		// ...
+	}
+
+}
+```
+
+### 32.3.3 Additional Kafka Properties
+```properties
+spring.kafka.properties.prop.one=first
+spring.kafka.admin.properties.prop.two=second
+spring.kafka.consumer.properties.prop.three=third
+spring.kafka.producer.properties.prop.four=fourth
+```
+
+* **JsonDeserializer**
+```properties
+spring.kafka.consumer.value-deserializer=org.springframework.kafka.support.serializer.JsonDeserializer
+spring.kafka.consumer.properties.spring.json.value.default.type=com.example.Invoice
+spring.kafka.consumer.properties.spring.json.trusted.packages=com.example,org.acme
+```
+
+```properties
+spring.kafka.producer.value-serializer=org.springframework.kafka.support.serializer.JsonSerializer
+spring.kafka.producer.properties.spring.json.add.type.headers=false
+```
 
 
 
