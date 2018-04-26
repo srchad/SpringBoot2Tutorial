@@ -679,4 +679,54 @@ Common servlet container settings can be configured by using Spring Environment 
 If you need to programmatically configure your embedded servlet container, you can register a Spring bean that implements the **WebServerFactoryCustomizer** interface. 
 If the preceding customization techniques are too limited, you can register the TomcatServletWebServerFactory, JettyServletWebServerFactory, or UndertowServletWebServerFactory bean yourself.
 
-### 28. Security
+## 28. Security
+If Spring Security is on the classpath, then web applications are secured by default. 
+you can also add **@EnableGlobalMethodSecurity** with your desired settings.
+
+You can change the username and password by providing a **spring.security.user.name** and **spring.security.user.password**.
+
+## 29. Working with SQL Databases
+javax.sql.DataSource interface
+
+#### 29.1.1 Embedded Database Support
+Spring Boot can auto-configure embedded H2, HSQL, and Derby databases.
+
+#### 29.1.2 Connection to a Production Database
+```
+spring.datasource.url=jdbc:mysql://localhost/test
+spring.datasource.username=dbuser
+spring.datasource.password=dbpass
+spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+```
+
+### 29.2 Using JdbcTemplate
+Spring’s JdbcTemplate and NamedParameterJdbcTemplate classes are auto-configured, and you can @Autowire them directly into your own beans
+
+### 29.3 JPA and “Spring Data”
+spring-boot-starter-data-jpa
+
+Hibernate: One of the most popular JPA implementations.
+Spring Data JPA: Makes it easy to implement JPA-based repositories.
+Spring ORMs: Core ORM support from the Spring Framework.
+
+https://docs.spring.io/spring-data/data-commons/docs/current/reference/html/#repositories
+
+### 29.4 Using H2’s Web Console
+
+### 29.5 Using jOOQ
+
+## 30. Working with NoSQL Technologies
+
+### 30.1 Redis
+Redis is a cache, message broker, and richly-featured key-value store. 
+spring-boot-starter-data-redis
+
+#### 30.1.1 Connecting to Redis
+You can inject an auto-configured **RedisConnectionFactory**, **StringRedisTemplate**, or vanilla **RedisTemplate** instance as you would any other Spring Bean.
+
+#### 30.6 Elasticsearch
+**spring-boot-starter-data-elasticsearch**
+
+## 31. Caching
+Spring Boot auto-configures the cache infrastructure as long as caching support is enabled via the **@EnableCaching** annotation.
+
