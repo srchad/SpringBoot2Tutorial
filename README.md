@@ -146,8 +146,7 @@ public static void main(String[] args) {
 
 #### 23.1 Startup Failure
 If your application fails to start, registered FailureAnalyzers get a chance to provide a dedicated error message and a concrete action to fix the problem. 
-[failure guide](https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#howto-failure-analyzer
-)
+[failure guide](https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#howto-failure-analyzer)
 
 If no failure analyzers are able to handle the exception, you can still display the full conditions report to better understand what went wrong. To do so, you need to enable the debug property or enable DEBUG logging for org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener.
 
@@ -699,6 +698,9 @@ spring.datasource.password=dbpass
 spring.datasource.driver-class-name=com.mysql.jdbc.Driver
 ```
 
+| how-to
+https://www.mkyong.com/tutorials/spring-boot-tutorials/
+
 ### 29.2 Using JdbcTemplate
 Spring’s JdbcTemplate and NamedParameterJdbcTemplate classes are auto-configured, and you can @Autowire them directly into your own beans
 
@@ -730,3 +732,326 @@ You can inject an auto-configured **RedisConnectionFactory**, **StringRedisTempl
 ## 31. Caching
 Spring Boot auto-configures the cache infrastructure as long as caching support is enabled via the **@EnableCaching** annotation.
 
+# Part V. Spring Boot Actuator: Production-ready features
+
+## 49. Enabling Production-ready Features
+
+프로덕션 관련 기능들을 제공한다, 애플리케이션을 HTTP endpoint or JMX 로 모니터링 혹은 관리를 할지 선택할 수 있다.
+기본적으로 HTTP 를 제공하는듯. 
+
+[http://localhost:8081/actuator](http://localhost:8081/actuator)
+
+| Definition of Actuator
+An actuator is a manufacturing term that refers to a mechanical device for moving or controlling something. 
+Actuators can generate a large amount of motion from a small change.
+
+> Maven
+```
+<dependencies>
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-actuator</artifactId>
+	</dependency>
+</dependencies>
+```
+
+> Gradle
+```
+dependencies {
+	compile("org.springframework.boot:spring-boot-starter-actuator")
+}
+```
+
+## 50. Endpoints
+애플리케이션을 모니터링하고 관리할 수 있게한다.
+예를 들어 Health라는 endpoint 를 켜고 끌 수 있다.
+endpoint에 리모트로 접근 하려면 http나 jmx로 접근할 수 있는 상황이어야 한다. (대부분은 http를 사용함)
+
+| endpoint
+https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#production-ready-endpoints
+
+### 50.1 Enabling Endpoints
+**management.endpoint.<id>.enabled**
+```
+management.endpoint.shutdown.enabled=true
+```
+
+disables all other endpoints
+```
+management.endpoints.enabled-by-default=false
+```
+
+### 50.2 Exposing Endpoints
+To change which endpoints are exposed, use the following technology-specific include and exclude properties:
+```
+management.endpoints.jmx.exposure.include
+management.endpoints.jmx.exposure.exclude
+
+management.endpoints.web.exposure.exclude=*
+management.endpoints.web.exposure.include=info,health
+```
+
+default로 shutdown 을 제외한 모든 endpoint가 enable 되어있다.
+http 는 info와 health 만 exposing 되는 것이 default, jmx는 모두 exposing
+
+### 50.3 Securing HTTP Endpoints
+**RequestMatcher**
+
+**EndpointRequest**
+
+'방화벽안에 있다면 다 열어두어도 상관이 없다'라고 이야기하지만 롤을 주고 관리하는 것이 좋을 것 같다.
+
+```
+@Configuration
+public class ActuatorSecurity extends WebSecurityConfigurerAdapter {
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.requestMatcher(EndpointRequest.toAnyEndpoint()).authorizeRequests()
+				.anyRequest().hasRole("ENDPOINT_ADMIN")
+				.and()
+			.httpBasic();
+	}
+
+}
+```
+
+### 50.4 Configuring Endpoints
+Endpoints **automatically cache** responses to read operations that do not take any parameters
+To configure the amount of time for which an endpoint will cache a response, use its **cache.time-to-live** property.
+
+```
+management.endpoint.beans.cache.time-to-live=10s
+```
+beans에 있는 내용들을 10초 동안 캐싱
+
+When making an authenticated HTTP request, the Principal is considered as input to the endpoint and, therefore, the response will not be cached.
+인증이 필요한 HTTP 의 경우에는 매번 인증시 마다 principal 이 인풋으로 간주가 되어 캐시가 안됨
+같은 principal의 경우에는 캐시가 되는건가?
+
+### 50.5 Hypermedia for Actuator Web Endpoints
+A “discovery page” is added with links to all the endpoints. The “discovery page” is available on /actuator by default.
+[http://localhost:8081/actuator](http://localhost:8081/actuator)
+
+### 50.6 Actuator Web Endpoint Paths
+By default, endpoints are exposed over HTTP under the /actuator path by using the ID of the endpoint. 
+For example, the beans endpoint is exposed under /actuator/beans.
+
+```
+management.endpoints.web.base-path=/management
+management.endpoints.web.path-mapping.health=healthcheck
+```
+
+### 50.7 CORS Support
+도메인이 달라도 리소스를 제공받을 수 있도록 허용
+
+CORS support is disabled by default and is only enabled once the **management.endpoints.web.cors.allowed-origins** property has been set. 
+```
+management.endpoints.web.cors.allowed-origins=http://example.com
+management.endpoints.web.cors.allowed-methods=GET,POST
+```
+
+### 50.8 Implementing Custom Endpoints
+@Bean과 @EndPoint 와 같이 붙여서 만들기, jersey/spring mvc/spring webflux
+@JmxEndpoint, @WebEndpoint 로 접근 가능
+@EndpointJmxExtension, @EndpointWebExtension 로 기능 확장 가능
+
+@Controller, @RestController 를 endpoint로 만들 수도 있는데 JMX로는 사용할 수 없고, 다른 웹 프레임워크를 사용하는 경우에도 사용할 수 없다. only servlet or spring
+
+@ManagementContextConfiguration 을 class 에 add 하면됨
+automatically, discovery에 등록됨
+
+#### 50.8.1 Receiving Input
+parameter로 받는다. (json request body or url)
+
+- Input type conversion 
+Before calling an operation method, the input received via JMX or an HTTP request is converted to the required types using an instance of ApplicationConversionService.
+operation method가 불려지기 전에 jmx나 http input을 받으면 ApplicationConversionService 에 의해 필요한 타입으로 컨버젼 해준다.
+
+#### 50.8.2 Custom Web Endpoints
+Operations on an @Endpoint, @WebEndpoint, or @WebEndpointExtension are automatically exposed over **HTTP** using Jersey, Spring MVC, or Spring WebFlux.
+
+- Web Endpoint Request Predicates
+A request predicate is automatically generated for each operation on a web-exposed **endpoint.**
+
+- Path
+The path of the predicate is determined by the **ID of the endpoint** and the base path of web-exposed endpoints. ex. /actuator/sessions
+
+- HTTP method
+@ReadOperation
+@WriteOperation
+@DeleteOperation
+
+- Consumes
+
+- Produces
+
+- Web Endpoint Response Status
+The default response status for an endpoint operation depends on the operation type (read, write, or delete) 
+
+- Web Endpoint Range Requests
+
+Range requests are not supported when using Jersey.
+
+- Web Endpoint Security
+
+#### 50.8.3 Servlet endpoints
+A Servlet can be exposed as an endpoint by implementing a class annotated with **@ServletEndpoint** that also implements Supplier<EndpointServlet>. 
+
+#### 50.8.4 Controller endpoints
+@ControllerEndpoint and @RestControllerEndpoint can be used to implement an endpoint that is only exposed by Spring MVC or Spring WebFlux.
+Methods are mapped using the standard annotations for Spring MVC and Spring WebFlux such as @RequestMapping and @GetMapping, with the endpoint’s ID being used as a prefix for the path.
+The @Endpoint and @WebEndpoint annotations should be preferred whenever possible.
+
+### 50.9 Health Information
+It is often used by monitoring software to alert someone when a production system goes down.
+
+```
+// never, when-authorized, always
+// The default value is never
+
+management.endpoint.health.show-details=always
+management.endpoint.health.roles
+```
+
+#### 50.9.1 Auto-configured HealthIndicators
+```
+management.health.defaults.enabled
+```
+
+#### 50.9.2 Writing Custom HealthIndicators
+To provide custom health information, you can register Spring beans that implement the HealthIndicator interface. 
+You need to provide an implementation of the health() method and return a Health response. 
+
+The identifier for a given HealthIndicator is the name of the bean without the HealthIndicator suffix, if it exists. In the preceding example, the health information is available in an entry named **my**.
+
+In addition to Spring Boot’s predefined Status types, it is also possible for Health to return a **custom Status** that represents a new system state. 
+In such cases, a custom implementation of the **HealthAggregator** interface also needs to be provided, or the default implementation has to be configured by using the **management.health.status.order** configuration property.
+
+```
+// add FATAL status
+management.health.status.order=FATAL, DOWN, OUT_OF_SERVICE, UNKNOWN, UP
+management.health.status.http-mapping.FATAL=503
+```
+
+If you need more control, you can define your own **HealthStatusHttpMapper** bean.
+
+#### 50.9.3 Reactive Health IndicatorsTo provide custom health information from a reactive API, you can register Spring beans that implement the **ReactiveHealthIndicator** interface.
+
+
+#### 50.9.4 Auto-configured ReactiveHealthIndicators
+- MongoReactiveHealthIndicator
+- RedisReactiveHealthIndicator
+
+### 50.10 Application Information
+
+Application information exposes various information collected from all **InfoContributor** beans defined in your ApplicationContext. Spring Boot includes a number of auto-configured InfoContributor beans, and you can write your own.
+
+#### 50.10.1 Auto-configured InfoContributors
+EnvironmentInfoContributor - Exposes any key from the Environment under the info key.
+GitInfoContributor - Exposes git information if a git.properties file is available.
+BuildInfoContributor - Exposes build information if a META-INF/build-info.properties file is available.
+
+It is possible to disable them all by setting the **management.info.defaults.enabled** property.
+
+#### 50.10.2 Custom Application Information
+```
+info.app.encoding=@project.build.sourceEncoding@
+info.app.java.source=@java.version@
+info.app.java.target=@java.version@
+```
+
+#### 50.10.3 Git Commit Information
+A GitProperties bean is auto-configured if a **git.properties** file is available at the root of the classpath.
+
+```
+management.info.git.mode
+management.info.git.branch
+management.info.git.commit.id
+management.info.git.commit.time
+```
+
+#### 50.10.4 Build Information
+If a BuildProperties bean is available, **META-INF/build-info.properties**
+
+#### 50.10.5 Writing Custom InfoContributors
+To provide custom application information, you can register Spring beans that implement the InfoContributor interface.
+
+## 51. Monitoring and Management over HTTP
+
+### 51.1 Customizing the Management Endpoint Paths
+```
+management.endpoints.web.base-path=/manage
+```
+
+### 51.2 Customizing the Management Server Port
+```
+management.server.port=8081
+```
+
+### 51.3 Configuring Management-specific SSL
+
+```
+server.port=8443
+server.ssl.enabled=true
+server.ssl.key-store=classpath:main.jks
+server.ssl.key-password=secret
+management.server.port=8080
+management.server.ssl.enabled=true
+management.server.ssl.key-store=classpath:management.jks
+management.server.ssl.key-password=secret
+```
+
+### 51.4 Customizing the Management Server Address
+```
+management.server.port=8081
+management.server.address=127.0.0.1
+```
+
+### 51.5 Disabling HTTP Endpoints
+```
+management.server.port=-1
+```
+
+## 52. Monitoring and Management over JMX
+
+### 52.1 Customizing MBean Names
+```
+management.endpoints.jmx.domain=com.example.myapp
+management.endpoints.jmx.unique-names=true
+```
+
+### 52.2 Disabling JMX Endpoints
+```
+management.endpoints.jmx.exposure.exclude=*
+```
+
+### 52.3 Using Jolokia for JMX over HTTP
+Jolokia is a JMX-HTTP bridge that provides an alternative method of accessing JMX beans.
+
+```
+<dependency>
+   <groupId>org.jolokia</groupId>
+   <artifactId>jolokia-core</artifactId>
+</dependency>
+```
+
+#### 52.3.1 Customizing Jolokia
+Jolokia has a number of settings that you would traditionally configure by setting servlet parameters.
+
+management.endpoint.jolokia.config
+
+#### 52.3.2 Disabling Jolokia
+```
+management.endpoint.jolokia.enabled=false
+```
+
+## 53. Loggers
+* level : TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF, null
+* null indicates that there is no explicit configuration.
+
+```
+{
+	"configuredLevel": "DEBUG"
+}
+```
