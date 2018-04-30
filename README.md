@@ -795,9 +795,7 @@ default로 shutdown 을 제외한 모든 endpoint가 enable 되어있다.
 http 는 info와 health 만 exposing 되는 것이 default, jmx는 모두 exposing
 
 ### 50.3 Securing HTTP Endpoints
-**RequestMatcher**
-
-**EndpointRequest**
+Spring Boot provides some convenient **RequestMatcher** objects that can be used in combination with Spring Security.
 
 '방화벽안에 있다면 다 열어두어도 상관이 없다'라고 이야기하지만 롤을 주고 관리하는 것이 좋을 것 같다.
 
@@ -815,6 +813,7 @@ public class ActuatorSecurity extends WebSecurityConfigurerAdapter {
 
 }
 ```
+모두가 admin 권한을 갖도록 설정
 
 ### 50.4 Configuring Endpoints
 Endpoints **automatically cache** responses to read operations that do not take any parameters
