@@ -860,6 +860,9 @@ management.endpoints.web.cors.allowed-methods=GET,POST
 @ManagementContextConfiguration 을 class 에 add 하면됨
 automatically, discovery에 등록됨
 
+참고
+https://www.javadevjournal.com/spring-boot/spring-boot-actuator-custom-endpoint/
+
 #### 50.8.1 Receiving Input
 parameter로 받는다. (json request body or url)
 
@@ -1027,6 +1030,7 @@ management.endpoints.jmx.exposure.exclude=*
 
 ### 52.3 Using Jolokia for JMX over HTTP
 Jolokia is a JMX-HTTP bridge that provides an alternative method of accessing JMX beans.
+Jolokia는 HTTP 프로토콜을 이용해 손쉽게 JMX 값을 JSON 형식으로 받아볼 수 있게 해주는 일종의 JMX-HTTP 커넥터입니다.
 
 ```
 <dependency>
