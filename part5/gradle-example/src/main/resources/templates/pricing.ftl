@@ -2,6 +2,8 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
     <title>Pricing</title>
 
     <link href="/webjars/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
@@ -16,7 +18,7 @@
             <a class="p-2 text-dark" href="#">Support</a>
             <a class="p-2 text-dark" href="#">Pricing</a>
         </nav>
-        <a class="btn btn-outline-primary" href="#">Sign up</a>
+        <a class="btn btn-outline-primary" href="sign-in">Sign in</a>
     </div>
 
     <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">

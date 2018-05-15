@@ -16,4 +16,8 @@ public class MyController {
         return "pricing";
     }
 
+    @RequestMapping("/sign-in")
+    public String signIn() {
+        return "sign-in";
+    }
 }
